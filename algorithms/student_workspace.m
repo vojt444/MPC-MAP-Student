@@ -32,7 +32,7 @@ periods = 100; %number of measurements
 if sensor == 1
     if read_only_vars.counter <= periods
         for channel = 1:8
-            public_vars.data_lidar(channel, read_only_vars.counter) = read_only_vars.lidar_distances(channel); % change the number 1-8 to choose LiDAR sensor channel
+            public_vars.data_lidar(channel, read_only_vars.counter) = read_only_vars.lidar_distances(channel);
         end
     end
     if read_only_vars.counter == periods + 1
@@ -62,37 +62,37 @@ if sensor == 1
 end
 
 % GNSS stats
-    if sensor == 2
-        if read_only_vars.counter <= periods
-            for axe = 1:2
-                public_vars.data_gnss(axe, read_only_vars.counter) = read_only_vars.gnss_position(axe); % change the number to choose the axe, 1 for x, 2 for y
-            end
+if sensor == 2
+    if read_only_vars.counter <= periods
+        for axe = 1:2
+            public_vars.data_gnss(axe, read_only_vars.counter) = read_only_vars.gnss_position(axe);
         end
-        if read_only_vars.counter == periods + 1
-            mean_gnss = 0;
-            variance_gnss = zeros(2,1);
-            public_vars.std_gnss = zeros(2,1);
-            for axe = 1:2
-                mean_gnss = sum(public_vars.data_gnss(axe,:))/length(public_vars.data_gnss(axe,:));
-                public_vars.std_gnss(axe) = std(public_vars.data_gnss(axe,:));
+    end
+    if read_only_vars.counter == periods + 1
+        mean_gnss = 0;
+        variance_gnss = zeros(2,1);
+        public_vars.std_gnss = zeros(2,1);
+        for axe = 1:2
+            mean_gnss = sum(public_vars.data_gnss(axe,:))/length(public_vars.data_gnss(axe,:));
+            public_vars.std_gnss(axe) = std(public_vars.data_gnss(axe,:));
 
-                figure(axe + 2)
-                histogram(public_vars.data_gnss(axe,:))
-                title(['Axe ', num2str(axe), ' GNSS data histogram']);
+            figure(axe + 2)
+            histogram(public_vars.data_gnss(axe,:))
+            title(['Axe ', num2str(axe), ' GNSS data histogram']);
 
-                public_vars.cov_gnss = cov(public_vars.data_gnss');
-                
-                if axe == 1
-                    x_gnss = (-5*public_vars.std_gnss(axe):0.01:5*public_vars.std_gnss(axe));
-                    PDF_gnss = norm_pdf(x_gnss, 0, public_vars.std_gnss(axe));
-                    figure(2);
-                    plot(x_gnss, PDF_gnss);
-                    grid on;
-                    title('GNSS sensor PDF');
-                end
+            public_vars.cov_gnss = cov(public_vars.data_gnss');
+            
+            if axe == 1
+                x_gnss = (-5*public_vars.std_gnss(axe):0.01:5*public_vars.std_gnss(axe));
+                PDF_gnss = norm_pdf(x_gnss, 0, public_vars.std_gnss(axe));
+                figure(2);
+                plot(x_gnss, PDF_gnss);
+                grid on;
+                title('GNSS sensor PDF');
             end
         end
     end
+end
 
 
 end
