@@ -6,6 +6,9 @@ if (read_only_vars.counter == 1)
           
     public_vars = init_particle_filter(read_only_vars, public_vars);
     public_vars = init_kalman_filter(read_only_vars, public_vars);
+    public_vars.target_index = 1;
+    public_vars.int_sum = 0;
+    public_vars.prev_error = 0;
 
 end
 
@@ -16,7 +19,7 @@ public_vars.particles = update_particle_filter(read_only_vars, public_vars);
 [public_vars.mu, public_vars.sigma] = update_kalman_filter(read_only_vars, public_vars);
 
 % 11. Estimate current robot position
-public_vars.estimated_pose = estimate_pose(public_vars); % (x,y,theta)
+public_vars.estimated_pose = estimate_pose(read_only_vars); % (x,y,theta)
 
 % 12. Path planning
 public_vars.path = plan_path(read_only_vars, public_vars);
@@ -24,75 +27,76 @@ public_vars.path = plan_path(read_only_vars, public_vars);
 % 13. Plan next motion command
 public_vars = plan_motion(read_only_vars, public_vars);
 
-% stats measuring
-sensor = 0; %1 for LiDAR, 2 for GNSS statistics, other for nothing
-periods = 100; %number of measurements
-
-% LiDAR stats
-if sensor == 1
-    if read_only_vars.counter <= periods
-        for channel = 1:8
-            public_vars.data_lidar(channel, read_only_vars.counter) = read_only_vars.lidar_distances(channel);
-        end
-    end
-    if read_only_vars.counter == periods + 1
-        mean_lidar = 0;
-        variance_lidar = zeros(8,1);
-        public_vars.std_lidar = zeros(8,1);
-        for channel = 1:8
-            mean_lidar = sum(public_vars.data_lidar(channel,:))/length(public_vars.data_lidar(channel,:));
-            public_vars.std_lidar(channel) = std(public_vars.data_lidar(channel,:));
-
-            figure(channel + 2);
-            histogram(public_vars.data_lidar(channel,:));
-            title(['Channel ', num2str(channel), ' LiDAR data histogram']);
-
-            public_vars.cov_lidar = cov(public_vars.data_lidar');
-
-            if channel == 1
-                x_lidar = (-5*public_vars.std_lidar(channel):0.01:5*public_vars.std_lidar(channel));
-                PDF_lidar = norm_pdf(x_lidar, 0, public_vars.std_lidar(channel));
-                figure(2)
-                plot(x_lidar, PDF_lidar);
-                grid on;
-                title('LiDAR sensor PDF');
-            end
-        end
-    end
-end
-
-% GNSS stats
-if sensor == 2
-    if read_only_vars.counter <= periods
-        for axe = 1:2
-            public_vars.data_gnss(axe, read_only_vars.counter) = read_only_vars.gnss_position(axe);
-        end
-    end
-    if read_only_vars.counter == periods + 1
-        mean_gnss = 0;
-        variance_gnss = zeros(2,1);
-        public_vars.std_gnss = zeros(2,1);
-        for axe = 1:2
-            mean_gnss = sum(public_vars.data_gnss(axe,:))/length(public_vars.data_gnss(axe,:));
-            public_vars.std_gnss(axe) = std(public_vars.data_gnss(axe,:));
-
-            figure(axe + 2)
-            histogram(public_vars.data_gnss(axe,:))
-            title(['Axe ', num2str(axe), ' GNSS data histogram']);
-
-            public_vars.cov_gnss = cov(public_vars.data_gnss');
-            
-            if axe == 1
-                x_gnss = (-5*public_vars.std_gnss(axe):0.01:5*public_vars.std_gnss(axe));
-                PDF_gnss = norm_pdf(x_gnss, 0, public_vars.std_gnss(axe));
-                figure(2);
-                plot(x_gnss, PDF_gnss);
-                grid on;
-                title('GNSS sensor PDF');
-            end
-        end
-    end
-end
+% 
+% % stats measuring
+% sensor = 0; %1 for LiDAR, 2 for GNSS statistics, other for nothing
+% periods = 100; %number of measurements
+% 
+% % LiDAR stats
+% if sensor == 1
+%     if read_only_vars.counter <= periods
+%         for channel = 1:8
+%             public_vars.data_lidar(channel, read_only_vars.counter) = read_only_vars.lidar_distances(channel);
+%         end
+%     end
+%     if read_only_vars.counter == periods + 1
+%         mean_lidar = 0;
+%         variance_lidar = zeros(8,1);
+%         public_vars.std_lidar = zeros(8,1);
+%         for channel = 1:8
+%             mean_lidar = sum(public_vars.data_lidar(channel,:))/length(public_vars.data_lidar(channel,:));
+%             public_vars.std_lidar(channel) = std(public_vars.data_lidar(channel,:));
+% 
+%             figure(channel + 2);
+%             histogram(public_vars.data_lidar(channel,:));
+%             title(['Channel ', num2str(channel), ' LiDAR data histogram']);
+% 
+%             public_vars.cov_lidar = cov(public_vars.data_lidar');
+% 
+%             if channel == 1
+%                 x_lidar = (-5*public_vars.std_lidar(channel):0.01:5*public_vars.std_lidar(channel));
+%                 PDF_lidar = norm_pdf(x_lidar, 0, public_vars.std_lidar(channel));
+%                 figure(2)
+%                 plot(x_lidar, PDF_lidar);
+%                 grid on;
+%                 title('LiDAR sensor PDF');
+%             end
+%         end
+%     end
+% end
+% 
+% % GNSS stats
+% if sensor == 2
+%     if read_only_vars.counter <= periods
+%         for axe = 1:2
+%             public_vars.data_gnss(axe, read_only_vars.counter) = read_only_vars.gnss_position(axe);
+%         end
+%     end
+%     if read_only_vars.counter == periods + 1
+%         mean_gnss = 0;
+%         variance_gnss = zeros(2,1);
+%         public_vars.std_gnss = zeros(2,1);
+%         for axe = 1:2
+%             mean_gnss = sum(public_vars.data_gnss(axe,:))/length(public_vars.data_gnss(axe,:));
+%             public_vars.std_gnss(axe) = std(public_vars.data_gnss(axe,:));
+% 
+%             figure(axe + 2)
+%             histogram(public_vars.data_gnss(axe,:))
+%             title(['Axe ', num2str(axe), ' GNSS data histogram']);
+% 
+%             public_vars.cov_gnss = cov(public_vars.data_gnss');
+% 
+%             if axe == 1
+%                 x_gnss = (-5*public_vars.std_gnss(axe):0.01:5*public_vars.std_gnss(axe));
+%                 PDF_gnss = norm_pdf(x_gnss, 0, public_vars.std_gnss(axe));
+%                 figure(2);
+%                 plot(x_gnss, PDF_gnss);
+%                 grid on;
+%                 title('GNSS sensor PDF');
+%             end
+%         end
+%     end
+% end
 
 
 end
