@@ -7,8 +7,7 @@ function [public_vars] = plan_motion(read_only_vars, public_vars)
 
 % II. Compute motion vector
 
-distance_vect = target(1,:) - public_vars.estimated_pose(1,1:2);
-distance = sqrt(distance_vect(1)^2 + distance_vect(2)^2);
+distance_vect = target(1,:) - public_vars.estimated_pose(1:2);
 
 theta = atan2(distance_vect(2),distance_vect(1));
 
@@ -18,23 +17,8 @@ angle_error = mod(angle_error + pi, 2*pi) - pi;
 v = distance_vect(1)*cos(theta) + distance_vect(2)*sin(theta);
 omega = max(-pi/4, min(pi/4,angle_error));
 
-% PID reg
-% Kp = 1.2;
-% Ki = 0.01;
-% Kd = 0.5;
-% 
-% lateral_error = -distance_vect(1)*sin(public_vars.estimated_pose(3)) + distance_vect(2)*cos(public_vars.estimated_pose(3));
-% 
-% P = Kp*lateral_error;
-% I = Ki*read_only_vars.sampling_period*public_vars.int_sum;
-% D = Kd*(lateral_error - public_vars.prev_error);
-% omega = P + I + D;
-% 
-% public_vars.int_sum = public_vars.int_sum + lateral_error;
-% public_vars.prev_error = lateral_error;
-
-v_L = v - (omega*read_only_vars.agent_drive.interwheel_dist/2);
-v_R = v + (omega*read_only_vars.agent_drive.interwheel_dist/2);
+v_L = (2*v - omega*read_only_vars.agent_drive.interwheel_dist)/2;
+v_R = (2*v + omega*read_only_vars.agent_drive.interwheel_dist)/2;
 
 public_vars.motion_vector = [v_R, v_L];
 

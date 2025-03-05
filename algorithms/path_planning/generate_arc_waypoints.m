@@ -3,7 +3,6 @@ function waypoints = generate_arc_waypoints(cx, cy, radius, start_angle_deg, ang
 start_angle_rad = deg2rad(start_angle_deg);
 end_angle_rad = deg2rad(start_angle_deg + angle_deg);
 
-% theta = linspace(0, deg2rad(angle_deg), N); 
 theta = linspace(start_angle_rad, end_angle_rad, N); 
 
 x = cx + radius * cos(theta);
@@ -18,9 +17,9 @@ for i=1:length(y)
     waypoints(i,2) = y(i); 
 end
 
-if strcmp(dir,'CW')
+if strcmp(dir,'CW') % clockwise
     waypoints = flip(waypoints);
-elseif strcmp(dir, 'CCW')
+elseif strcmp(dir, 'CCW') % counter clockwise
 
 else
     error("Use only 'CW' or 'CCW' direction parameter.");
