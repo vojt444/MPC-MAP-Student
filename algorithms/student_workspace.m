@@ -27,9 +27,9 @@ public_vars.path = plan_path(read_only_vars, public_vars);
 % 13. Plan next motion command
 public_vars = plan_motion(read_only_vars, public_vars);
 
-% 
+
 % % stats measuring
-% sensor = 0; %1 for LiDAR, 2 for GNSS statistics, other for nothing
+% sensor = 2; %1 for LiDAR, 2 for GNSS statistics, other for nothing
 % periods = 100; %number of measurements
 % 
 % % LiDAR stats
