@@ -9,6 +9,7 @@ if (read_only_vars.counter == 1)
     public_vars.target_index = 1;
     public_vars.int_sum = 0;
     public_vars.prev_error = 0;
+    public_vars.control_pos = 0; 
 
 end
 
@@ -19,7 +20,7 @@ public_vars.particles = update_particle_filter(read_only_vars, public_vars);
 [public_vars.mu, public_vars.sigma] = update_kalman_filter(read_only_vars, public_vars);
 
 % 11. Estimate current robot position
-public_vars.estimated_pose = estimate_pose(read_only_vars); % (x,y,theta)
+public_vars.estimated_pose = estimate_pose(read_only_vars, public_vars); % (x,y,theta)
 
 % 12. Path planning
 public_vars.path = plan_path(read_only_vars, public_vars);
