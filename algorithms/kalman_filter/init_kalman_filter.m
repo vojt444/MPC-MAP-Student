@@ -5,9 +5,9 @@ init_theta = 0;
 
 public_vars.kf.C = [1 0 0; 
                     0 1 0];
-public_vars.kf.R = [0.0001 0 0; 
-                    0 0.0001 0; 
-                    0 0 0.0001];
+public_vars.kf.R = [0.0002 0 0; 
+                    0 0.0002 0; 
+                    0 0 0.0002];
 public_vars.kf.Q = [0.2389 -0.0147;
                     -0.0147 0.2087];
 
