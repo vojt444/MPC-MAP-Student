@@ -21,6 +21,6 @@ v_R = max(-2, min(2,v_R));
 
 public_vars.motion_vector = [v_R v_L];
 
-% public_vars.motion_vector = [0 0];
+public_vars.motion_vector = [0 0];
 
 end
