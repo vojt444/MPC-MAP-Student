@@ -14,8 +14,8 @@ omega = 2*v*sin(angle_error)/read_only_vars.agent_drive.interwheel_dist;
 v_L = v - (omega*read_only_vars.agent_drive.interwheel_dist/2);
 v_R = v + (omega*read_only_vars.agent_drive.interwheel_dist/2);
 
-v_L = max(-2, min(2,v_L));
-v_R = max(-2, min(2,v_R));
+v_L = max(-3, min(3,v_L));
+v_R = max(-3, min(3,v_R));
 
 public_vars.motion_vector = [v_R v_L];
 

@@ -8,10 +8,18 @@ public_vars.kf.C = [1 0 0;
 public_vars.kf.R = [0.0005 0 0; 
                     0 0.0005 0; 
                     0 0 0.00005];
-public_vars.kf.Q = cov(read_only_vars.gnss_history(:,:));
 
-public_vars.mu = [mean(read_only_vars.gnss_history,1) init_theta];
+if any(isnan(read_only_vars.gnss_history(:,:)))
+    public_vars.kf.Q = [0.2443,	0.0294; 0.0294,	0.2825];
+    public_vars.mu = [0, 0, 0];
+else
+    public_vars.kf.Q = cov(read_only_vars.gnss_history(:,:));
+    public_vars.mu = [mean(read_only_vars.gnss_history,1) init_theta];
+end
+
 public_vars.sigma = diag([public_vars.kf.Q(1,1), public_vars.kf.Q(2,2), 10]);
+
+
 
 end
 

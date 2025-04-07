@@ -2,25 +2,45 @@ function [public_vars] = student_workspace(read_only_vars,public_vars)
 %STUDENT_WORKSPACE Summary of this function goes here
 
 % 8. Perform initialization procedure
-if (read_only_vars.counter == 1)          
-    public_vars = init_particle_filter(read_only_vars, public_vars);
+if (read_only_vars.counter == 1)
+    % public_vars = init_particle_filter(read_only_vars, public_vars);
     public_vars.target_index = 1;
     public_vars.delay_const = 50;
     public_vars.max_wall_width = 5;
     public_vars.walls_width = 0;
+    public_vars.is_indoor = any(isnan(read_only_vars.gnss_position));
+    public_vars.is_indoor_prev = public_vars.is_indoor;
+    public_vars.kalman_inited = 0;
 end
 
+public_vars.is_indoor_prev = public_vars.is_indoor;
+public_vars.is_indoor = any(isnan(read_only_vars.gnss_position));
 
 % 9. Update particle filter
-if any(isnan(read_only_vars.gnss_position))
+if read_only_vars.counter == 1 && public_vars.is_indoor == 1
+    public_vars = init_particle_filter(read_only_vars, public_vars);
+end
+if public_vars.is_indoor == 1 && public_vars.is_indoor_prev == 0
+    public_vars = init_transition_from_outdoor(read_only_vars, public_vars);
+end
+if public_vars.is_indoor == 1
     public_vars.particles = update_particle_filter(read_only_vars, public_vars);
 end
 
 % 10. Update Kalman filter
-if read_only_vars.counter == public_vars.delay_const
-    public_vars = init_kalman_filter(read_only_vars,public_vars);
+if read_only_vars.counter == public_vars.delay_const && public_vars.is_indoor == 0 && public_vars.kalman_inited == 0
+    public_vars = init_kalman_filter(read_only_vars, public_vars);
+    public_vars.kalman_inited = 1;
 end
-if read_only_vars.counter > public_vars.delay_const
+if public_vars.is_indoor == 0 && public_vars.is_indoor_prev == 1 && public_vars.kalman_inited == 0
+    public_vars = init_kalman_filter(read_only_vars, public_vars);
+    public_vars = init_transition_from_indoor(read_only_vars, public_vars);
+    public_vars.kalman_inited = 1;
+end
+if public_vars.is_indoor == 0 && public_vars.is_indoor_prev == 1 && public_vars.kalman_inited == 1
+    public_vars = init_transition_from_indoor(read_only_vars, public_vars);
+end
+if read_only_vars.counter > public_vars.delay_const && public_vars.kalman_inited == 1 && public_vars.is_indoor == 0
     [public_vars.mu, public_vars.sigma] = update_kalman_filter(read_only_vars, public_vars);
 end
 
@@ -35,7 +55,7 @@ if read_only_vars.counter == public_vars.delay_const
 end
 
 % 13. Plan next motion command
-if read_only_vars.counter > public_vars.delay_const
+if read_only_vars.counter >= public_vars.delay_const
     public_vars = plan_motion(read_only_vars, public_vars);
 end
 
