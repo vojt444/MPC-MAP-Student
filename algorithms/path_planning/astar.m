@@ -5,10 +5,10 @@ extended_map = extend_map(read_only_vars.discrete_map.map, public_vars.walls_wid
 [rows, cols] = size(extended_map);
 
 robot_est_pos = [public_vars.estimated_pose(1) public_vars.estimated_pose(2)];
-robot_disc_row = round(((robot_est_pos(1) - read_only_vars.map.limits(1))/(read_only_vars.map.limits(3) - read_only_vars.map.limits(1)))*read_only_vars.discrete_map.dims(2));
-robot_disc_col = round(((robot_est_pos(2) - read_only_vars.map.limits(2))/(read_only_vars.map.limits(4) - read_only_vars.map.limits(2)))*read_only_vars.discrete_map.dims(1));
+robot_disc_row = round(((robot_est_pos(1) - read_only_vars.map.limits(1))/(read_only_vars.map.limits(3) - read_only_vars.map.limits(1)))*read_only_vars.discrete_map.dims(1));
+robot_disc_col = round(((robot_est_pos(2) - read_only_vars.map.limits(2))/(read_only_vars.map.limits(4) - read_only_vars.map.limits(2)))*read_only_vars.discrete_map.dims(2));
 
-start = [robot_disc_row robot_disc_col];
+start = [robot_disc_col robot_disc_row];
 goal = [read_only_vars.discrete_map.goal(2) read_only_vars.discrete_map.goal(1)];
 
 if extended_map(start(1), start(2)) == 1 || extended_map(goal(1), goal(2)) == 1

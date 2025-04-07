@@ -12,7 +12,9 @@ end
 
 
 % 9. Update particle filter
-public_vars.particles = update_particle_filter(read_only_vars, public_vars);
+if any(isnan(read_only_vars.gnss_position))
+    public_vars.particles = update_particle_filter(read_only_vars, public_vars);
+end
 
 % 10. Update Kalman filter
 if read_only_vars.counter == public_vars.delay_const
@@ -33,7 +35,7 @@ if read_only_vars.counter == public_vars.delay_const
 end
 
 % 13. Plan next motion command
-if read_only_vars.counter > public_vars.delay_const + 1
+if read_only_vars.counter > public_vars.delay_const
     public_vars = plan_motion(read_only_vars, public_vars);
 end
 

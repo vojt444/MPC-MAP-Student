@@ -1,6 +1,6 @@
 function [distance_vector, public_vars] = get_target(estimated_pose, public_vars)
 %GET_TARGET Summary of this function goes here
-max_error = 0.3;
+max_error = 0.2;
 
 target_point = public_vars.path(public_vars.target_index,:);
 distance_vector = target_point - estimated_pose(1,1:2);
