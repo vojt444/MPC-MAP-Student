@@ -55,7 +55,7 @@ if read_only_vars.counter == public_vars.delay_const
 end
 
 % 13. Plan next motion command
-if read_only_vars.counter >= public_vars.delay_const
+if read_only_vars.counter > public_vars.delay_const
     public_vars = plan_motion(read_only_vars, public_vars);
 end
 

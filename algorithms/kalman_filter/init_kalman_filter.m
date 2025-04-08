@@ -7,10 +7,10 @@ public_vars.kf.C = [1 0 0;
                     0 1 0];
 public_vars.kf.R = [0.0005 0 0; 
                     0 0.0005 0; 
-                    0 0 0.00005];
+                    0 0 0.00009];
 
 if any(isnan(read_only_vars.gnss_history(:,:)))
-    public_vars.kf.Q = [0.2443,	0.0294; 0.0294,	0.2825];
+    public_vars.kf.Q = [0.2308,	-0.0237; -0.0237, 0.3647];
     public_vars.mu = [0, 0, 0];
 else
     public_vars.kf.Q = cov(read_only_vars.gnss_history(:,:));

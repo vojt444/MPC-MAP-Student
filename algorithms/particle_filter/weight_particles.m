@@ -9,4 +9,3 @@ weights = 1./(sqrt(sum(diff,2)));
 weights = weights/sum(weights);
 
 end
-
